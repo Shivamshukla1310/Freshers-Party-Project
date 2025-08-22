@@ -1,1 +1,206 @@
 
+<!-- ==================== templates/admin/dashboard.html ==================== -->
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - {{ event.name }}{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex justify-between items-center">
+    <h1 class="text-3xl font-bold bg-gradient-to-r from-neon to-neon-purple bg-clip-text text-transparent">
+        Admin Dashboard
+    </h1>
+    <div class="space-x-2">
+        <a href="{{ url_for('admin_scan_qr') }}" class="btn btn-primary">
+            <i class="fas fa-qrcode mr-2"></i>
+            Scan QR
+        </a>
+        <a href="{{ url_for('admin_logout') }}" class="btn btn-outline btn-error">
+            <i class="fas fa-sign-out-alt mr-2"></i>
+            Logout
+        </a>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="stat bg-base-200/30 backdrop-blur-md rounded-lg border border-neon/20">
+        <div class="stat-figure text-neon">
+            <i class="fas fa-users text-3xl"></i>
+        </div>
+        <div class="stat-title">Total Registrations</div>
+        <div class="stat-value text-neon">{{ total_registrations }}</div>
+        <div class="stat-desc">All time registrations</div>
+    </div>
+
+    <div class="stat bg-base-200/30 backdrop-blur-md rounded-lg border border-neon-purple/20">
+        <div class="stat-figure text-neon-purple">
+            <i class="fas fa-check-circle text-3xl"></i>
+        </div>
+        <div class="stat-title">Paid Registrations</div>
+        <div class="stat-value text-neon-purple">{{ total_payments }}</div>
+        <div class="stat-desc">Completed payments</div>
+    </div>
+
+    <div class="stat bg-base-200/30 backdrop-blur-md rounded-lg border border-neon-pink/20">
+        <div class="stat-figure text-neon-pink">
+            <i class="fas fa-door-open text-3xl"></i>
+        </div>
+        <div class="stat-title">Entries</div>
+        <div class="stat-value text-neon-pink">{{ total_entries }}</div>
+        <div class="stat-desc">People entered</div>
+    </div>
+
+    <div class="stat bg-base-200/30 backdrop-blur-md rounded-lg border border-green-400/20">
+        <div class="stat-figure text-green-400">
+            <i class="fas fa-rupee-sign text-3xl"></i>
+        </div>
+        <div class="stat-title">Revenue</div>
+        <div class="stat-value text-green-400">₹{{ total_revenue }}</div>
+        <div class="stat-desc">Total collected</div>
+    </div>
+</div>
+
+<!-- Actions -->
+<div class="flex flex-wrap gap-4 mb-6">
+    <a href="{{ url_for('export_csv') }}" class="btn btn-outline btn-success">
+        <i class="fas fa-download mr-2"></i>
+        Export CSV
+    </a>
+    <button class="btn btn-outline btn-primary" onclick="refreshData()">
+        <i class="fas fa-sync-alt mr-2"></i>
+        Refresh Data
+    </button>
+</div>
+
+<!-- Users Table -->
+<div class="card bg-base-200/30 backdrop-blur-md shadow-xl">
+    <div class="card-header p-6 border-b border-base-300">
+        <h2 class="text-xl font-bold">Registered Users</h2>
+    </div>
+    <div class="card-body p-0">
+        <div class="overflow-x-auto">
+            <table class="table table-zebra w-full">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Mobile</th>
+                        <th>Payment</th>
+                        <th>Entry</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>
+                            <div class="font-bold">{{ user.name }}</div>
+                        </td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.mobile }}</td>
+                        <td>
+                            {% if user.payment_status == 'completed' %}
+                                <span class="badge badge-success">Paid</span>
+                            {% else %}
+                                <span class="badge badge-error">Pending</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if user.used_status %}
+                                <span class="badge badge-warning">Used</span>
+                            {% else %}
+                                <span class="badge badge-info">Not Used</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ user.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>
+                            <div class="dropdown dropdown-end">
+                                <div tabindex="0" role="button" class="btn btn-ghost btn-sm">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </div>
+                                <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
+                                    <li>
+                                        <button onclick="showQRCode('{{ user.qr_code }}', '{{ user.name }}')">
+                                            <i class="fas fa-qrcode mr-2"></i>View QR
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button onclick="toggleEntryStatus({{ user.id }}, {{ user.used_status|lower }})">
+                                            <i class="fas fa-toggle-on mr-2"></i>
+                                            {% if user.used_status %}Mark as Unused{% else %}Mark as Used{% endif %}
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- QR Code Modal -->
+<div id="qrModal" class="modal">
+    <div class="modal-box">
+        <h3 class="font-bold text-lg mb-4">QR Code</h3>
+        <div class="text-center">
+            <div id="qrCodeContainer" class="mb-4"></div>
+            <p id="qrUserName" class="font-semibold"></p>
+            <p id="qrCodeText" class="text-sm text-gray-400 font-mono"></p>
+        </div>
+        <div class="modal-action">
+            <button class="btn" onclick="document.getElementById('qrModal').classList.remove('modal-open')">Close</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script>
+function refreshData() {
+    location.reload();
+}
+
+function showQRCode(qrCode, userName) {
+    document.getElementById('qrUserName').textContent = userName;
+    document.getElementById('qrCodeText').textContent = qrCode;
+    
+    // Generate QR code
+    QRCode.toCanvas(document.createElement('canvas'), qrCode, function (error, canvas) {
+        if (error) console.error(error);
+        canvas.style.maxWidth = '200px';
+        canvas.style.height = 'auto';
+        
+        const container = document.getElementById('qrCodeContainer');
+        container.innerHTML = '';
+        container.appendChild(canvas);
+    });
+    
+    document.getElementById('qrModal').classList.add('modal-open');
+}
+
+async function toggleEntryStatus(userId, currentStatus) {
+    try {
+        const response = await fetch(`/admin/toggle_entry/${userId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            location.reload();
+        } else {
+            alert('Failed to update entry status');
+        }
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+}
+</script>
+{% endblock %}
+

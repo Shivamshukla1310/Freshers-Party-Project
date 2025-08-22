@@ -1,1 +1,184 @@
 
+<!-- ==================== templates/admin/scan_qr.html ==================== -->
+{% extends "base.html" %}
+
+{% block title %}Scan QR Code - Admin{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="mb-6 flex justify-between items-center">
+        <h1 class="text-3xl font-bold bg-gradient-to-r from-neon to-neon-purple bg-clip-text text-transparent">
+            QR Code Scanner
+        </h1>
+        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline">
+            <i class="fas fa-arrow-left mr-2"></i>
+            Back to Dashboard
+        </a>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-6">
+        <!-- Manual Entry -->
+        <div class="card bg-base-200/30 backdrop-blur-md shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title text-neon">
+                    <i class="fas fa-keyboard mr-2"></i>
+                    Manual Entry
+                </h2>
+                
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Enter QR Code</span>
+                    </label>
+                    <div class="join">
+                        <input type="text" id="qrInput" class="input input-bordered join-item flex-1" placeholder="Paste QR code here">
+                        <button class="btn btn-primary join-item" onclick="validateQRCode()">
+                            <i class="fas fa-check"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result Display -->
+        <div class="card bg-base-200/30 backdrop-blur-md shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title text-neon-purple">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    Validation Result
+                </h2>
+                
+                <div id="resultContainer" class="text-center py-8 text-gray-400">
+                    <i class="fas fa-qrcode text-4xl mb-4"></i>
+                    <p>Enter a QR code to validate</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Validations -->
+    <div class="card bg-base-200/30 backdrop-blur-md shadow-xl mt-8">
+        <div class="card-body">
+            <h2 class="card-title text-neon-pink">
+                <i class="fas fa-history mr-2"></i>
+                Recent Validations
+            </h2>
+            
+            <div id="recentValidations" class="space-y-2">
+                <p class="text-gray-400 text-center py-4">No recent validations</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let recentValidations = [];
+
+async function validateQRCode() {
+    const qrCode = document.getElementById('qrInput').value.trim();
+    
+    if (!qrCode) {
+        showResult('error', 'Please enter a QR code');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/admin/validate_qr', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ qr_code: qrCode })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showResult('success', result.message, result.user);
+            addToRecentValidations('success', result.user.name, qrCode);
+        } else {
+            showResult('error', result.error, result.user ? { name: result.user } : null);
+            addToRecentValidations('error', result.user || 'Unknown', qrCode);
+        }
+        
+        // Clear input
+        document.getElementById('qrInput').value = '';
+        
+    } catch (error) {
+        showResult('error', 'Network error: ' + error.message);
+    }
+}
+
+function showResult(type, message, user = null) {
+    const container = document.getElementById('resultContainer');
+    
+    if (type === 'success') {
+        container.innerHTML = `
+            <div class="text-center">
+                <i class="fas fa-check-circle text-6xl text-green-500 mb-4"></i>
+                <h3 class="text-xl font-bold text-green-500 mb-2">Entry Granted</h3>
+                <p class="text-gray-300 mb-4">${message}</p>
+                ${user ? `
+                    <div class="bg-base-300/50 rounded-lg p-4">
+                        <p><strong>Name:</strong> ${user.name}</p>
+                        <p><strong>Email:</strong> ${user.email}</p>
+                        <p><strong>Mobile:</strong> ${user.mobile}</p>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    } else {
+        container.innerHTML = `
+            <div class="text-center">
+                <i class="fas fa-times-circle text-6xl text-red-500 mb-4"></i>
+                <h3 class="text-xl font-bold text-red-500 mb-2">Entry Denied</h3>
+                <p class="text-gray-300">${message}</p>
+            </div>
+        `;
+    }
+}
+
+function addToRecentValidations(type, name, qrCode) {
+    const validation = {
+        type: type,
+        name: name,
+        qrCode: qrCode.substring(0, 8) + '...',
+        time: new Date().toLocaleTimeString()
+    };
+    
+    recentValidations.unshift(validation);
+    recentValidations = recentValidations.slice(0, 10); // Keep last 10
+    
+    updateRecentValidations();
+}
+
+function updateRecentValidations() {
+    const container = document.getElementById('recentValidations');
+    
+    if (recentValidations.length === 0) {
+        container.innerHTML = '<p class="text-gray-400 text-center py-4">No recent validations</p>';
+        return;
+    }
+    
+    container.innerHTML = recentValidations.map(v => `
+        <div class="flex justify-between items-center p-3 bg-base-300/30 rounded">
+            <div class="flex items-center space-x-3">
+                <i class="fas fa-${v.type === 'success' ? 'check' : 'times'} text-${v.type === 'success' ? 'green' : 'red'}-500"></i>
+                <div>
+                    <p class="font-semibold">${v.name}</p>
+                    <p class="text-sm text-gray-400">${v.qrCode}</p>
+                </div>
+            </div>
+            <span class="text-sm text-gray-400">${v.time}</span>
+        </div>
+    `).join('');
+}
+
+// Allow Enter key to validate
+document.getElementById('qrInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        validateQRCode();
+    }
+});
+</script>
+{% endblock %}
+

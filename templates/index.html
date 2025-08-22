@@ -1,1 +1,525 @@
 
+<!-- ==================== templates/base.html ==================== -->
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ event.name }}{% endblock %}</title>
+    
+    <!-- DaisyUI + Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.4.19/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'neon': '#00ffff',
+                        'neon-purple': '#bd00ff',
+                        'neon-pink': '#ff007f'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <!-- Navigation -->
+    <nav class="navbar bg-base-100/10 backdrop-blur-md sticky top-0 z-50">
+        <div class="navbar-start">
+            <a href="{{ url_for('index') }}" class="btn btn-ghost text-xl text-neon">
+                <i class="fas fa-party-horn mr-2"></i>
+                Fresher's Party
+            </a>
+        </div>
+        <div class="navbar-end">
+            <a href="{{ url_for('register') }}" class="btn btn-primary btn-sm mr-2">
+                <i class="fas fa-ticket mr-1"></i>
+                Register
+            </a>
+            <div class="dropdown dropdown-end">
+                <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
+                    <i class="fas fa-bars"></i>
+                </div>
+                <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+                    <li><a href="{{ url_for('index') }}"><i class="fas fa-home mr-2"></i>Home</a></li>
+                    <li><a href="{{ url_for('register') }}"><i class="fas fa-user-plus mr-2"></i>Register</a></li>
+                    <li><a href="{{ url_for('admin_login') }}"><i class="fas fa-shield-alt mr-2"></i>Admin</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="alert alert-info mb-4">
+                    {% for message in messages %}
+                        <span>{{ message }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- WhatsApp Float Button -->
+    <div class="fixed bottom-6 right-6 z-50">
+        <a href="https://wa.me/{{ event.whatsapp }}?text=Hi! I have a query about the Fresher's Party" 
+           target="_blank" class="btn btn-circle btn-lg bg-green-500 hover:bg-green-600 border-none text-white shadow-lg animate-pulse">
+            <i class="fab fa-whatsapp text-2xl"></i>
+        </a>
+    </div>
+
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>
+
+<!-- ==================== templates/index.html ==================== -->
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero min-h-screen bg-gradient-to-r from-purple-900/20 to-pink-900/20 rounded-3xl mb-12">
+    <div class="hero-content text-center">
+        <div class="max-w-4xl">
+            <div class="mb-8">
+                <h1 class="text-6xl font-bold bg-gradient-to-r from-neon via-neon-purple to-neon-pink bg-clip-text text-transparent animate-pulse">
+                    {{ event.name }}
+                </h1>
+                <p class="text-xl text-gray-300 mt-4">The most awaited celebration of the year!</p>
+            </div>
+            
+            <!-- Countdown Timer -->
+            <div class="grid grid-cols-4 gap-4 mb-8" id="countdown">
+                <div class="stat bg-base-200/30 backdrop-blur-md rounded-lg">
+                    <div class="stat-value text-neon" id="days">00</div>
+                    <div class="stat-desc">Days</div>
+                </div>
+                <div class="stat bg-base-200/30 backdrop-blur-md rounded-lg">
+                    <div class="stat-value text-neon-purple" id="hours">00</div>
+                    <div class="stat-desc">Hours</div>
+                </div>
+                <div class="stat bg-base-200/30 backdrop-blur-md rounded-lg">
+                    <div class="stat-value text-neon-pink" id="minutes">00</div>
+                    <div class="stat-desc">Minutes</div>
+                </div>
+                <div class="stat bg-base-200/30 backdrop-blur-md rounded-lg">
+                    <div class="stat-value text-neon" id="seconds">00</div>
+                    <div class="stat-desc">Seconds</div>
+                </div>
+            </div>
+
+            <!-- CTA Button -->
+            <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg px-12 text-lg hover:scale-105 transition-transform duration-300 shadow-lg hover:shadow-neon/50">
+                <i class="fas fa-rocket mr-2"></i>
+                Register Now - ₹{{ event.ticket_price }}
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Event Details -->
+<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+    <!-- Date & Time -->
+    <div class="card bg-base-200/30 backdrop-blur-md shadow-xl hover:shadow-neon/20 transition-all duration-300">
+        <div class="card-body items-center text-center">
+            <i class="fas fa-calendar-alt text-4xl text-neon mb-4"></i>
+            <h2 class="card-title text-neon">Date & Time</h2>
+            <p class="text-gray-300">{{ event.date }}</p>
+            <p class="text-gray-300">{{ event.time }}</p>
+        </div>
+    </div>
+
+    <!-- Venue -->
+    <div class="card bg-base-200/30 backdrop-blur-md shadow-xl hover:shadow-neon-purple/20 transition-all duration-300">
+        <div class="card-body items-center text-center">
+            <i class="fas fa-map-marker-alt text-4xl text-neon-purple mb-4"></i>
+            <h2 class="card-title text-neon-purple">Venue</h2>
+            <p class="text-gray-300">{{ event.venue }}</p>
+            <a href="#" class="btn btn-sm btn-outline btn-primary">Get Directions</a>
+        </div>
+    </div>
+
+    <!-- Dress Code -->
+    <div class="card bg-base-200/30 backdrop-blur-md shadow-xl hover:shadow-neon-pink/20 transition-all duration-300">
+        <div class="card-body items-center text-center">
+            <i class="fas fa-tshirt text-4xl text-neon-pink mb-4"></i>
+            <h2 class="card-title text-neon-pink">Dress Code</h2>
+            <p class="text-gray-300">{{ event.dress_code }}</p>
+            <p class="text-sm text-gray-400">Look your best!</p>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="mb-12">
+    <h2 class="text-4xl font-bold text-center mb-8 bg-gradient-to-r from-neon to-neon-purple bg-clip-text text-transparent">
+        What's Included?
+    </h2>
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="text-center">
+            <div class="w-16 h-16 mx-auto bg-gradient-to-r from-neon to-neon-purple rounded-full flex items-center justify-center mb-4">
+                <i class="fas fa-music text-2xl text-black"></i>
+            </div>
+            <h3 class="font-bold text-lg mb-2">Live DJ</h3>
+            <p class="text-gray-400 text-sm">Dance to the hottest beats</p>
+        </div>
+        <div class="text-center">
+            <div class="w-16 h-16 mx-auto bg-gradient-to-r from-neon-purple to-neon-pink rounded-full flex items-center justify-center mb-4">
+                <i class="fas fa-utensils text-2xl text-black"></i>
+            </div>
+            <h3 class="font-bold text-lg mb-2">Food & Drinks</h3>
+            <p class="text-gray-400 text-sm">Delicious refreshments</p>
+        </div>
+        <div class="text-center">
+            <div class="w-16 h-16 mx-auto bg-gradient-to-r from-neon-pink to-neon rounded-full flex items-center justify-center mb-4">
+                <i class="fas fa-trophy text-2xl text-black"></i>
+            </div>
+            <h3 class="font-bold text-lg mb-2">Prizes</h3>
+            <p class="text-gray-400 text-sm">Win amazing rewards</p>
+        </div>
+        <div class="text-center">
+            <div class="w-16 h-16 mx-auto bg-gradient-to-r from-neon to-neon-pink rounded-full flex items-center justify-center mb-4">
+                <i class="fas fa-camera text-2xl text-black"></i>
+            </div>
+            <h3 class="font-bold text-lg mb-2">Photo Booth</h3>
+            <p class="text-gray-400 text-sm">Capture memories</p>
+        </div>
+    </div>
+</div>
+
+<!-- Contact Section -->
+<div class="card bg-base-200/30 backdrop-blur-md shadow-xl">
+    <div class="card-body text-center">
+        <h2 class="card-title justify-center text-2xl mb-4">Need Help?</h2>
+        <div class="flex flex-wrap justify-center gap-4">
+            <a href="tel:{{ event.contact }}" class="btn btn-outline btn-primary">
+                <i class="fas fa-phone mr-2"></i>
+                {{ event.contact }}
+            </a>
+            <a href="mailto:{{ event.email }}" class="btn btn-outline btn-secondary">
+                <i class="fas fa-envelope mr-2"></i>
+                Email Us
+            </a>
+            <a href="https://wa.me/{{ event.whatsapp }}" target="_blank" class="btn btn-outline btn-success">
+                <i class="fab fa-whatsapp mr-2"></i>
+                WhatsApp
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+// Countdown Timer
+const eventDate = new Date('{{ event.date }}T{{ event.time.split()[0] }}:00').getTime();
+
+function updateCountdown() {
+    const now = new Date().getTime();
+    const distance = eventDate - now;
+    
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+    
+    document.getElementById('days').textContent = days.toString().padStart(2, '0');
+    document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+    document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+    document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+    
+    if (distance < 0) {
+        document.getElementById('countdown').innerHTML = '<div class="text-2xl text-neon">Event Started!</div>';
+    }
+}
+
+updateCountdown();
+setInterval(updateCountdown, 1000);
+</script>
+{% endblock %}
+
+<!-- ==================== templates/register.html ==================== -->
+{% extends "base.html" %}
+
+{% block title %}Register - {{ event.name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold bg-gradient-to-r from-neon to-neon-purple bg-clip-text text-transparent mb-4">
+            Register for {{ event.name }}
+        </h1>
+        <p class="text-gray-300">Secure your spot at the biggest party of the year!</p>
+    </div>
+
+    <div class="card bg-base-200/30 backdrop-blur-md shadow-xl">
+        <div class="card-body">
+            <form id="registrationForm">
+                <div class="form-control mb-4">
+                    <label class="label">
+                        <span class="label-text text-neon">Full Name *</span>
+                    </label>
+                    <input type="text" name="name" class="input input-bordered input-primary" placeholder="Enter your full name" required>
+                </div>
+
+                <div class="form-control mb-4">
+                    <label class="label">
+                        <span class="label-text text-neon-purple">Email Address *</span>
+                    </label>
+                    <input type="email" name="email" class="input input-bordered input-secondary" placeholder="Enter your email" required>
+                </div>
+
+                <div class="form-control mb-6">
+                    <label class="label">
+                        <span class="label-text text-neon-pink">Mobile Number *</span>
+                    </label>
+                    <input type="tel" name="mobile" class="input input-bordered input-accent" placeholder="Enter your mobile number" required>
+                </div>
+
+                <!-- Ticket Info -->
+                <div class="bg-base-300/50 rounded-lg p-6 mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-lg font-semibold">Event Ticket</span>
+                        <span class="text-2xl font-bold text-neon">₹{{ event.ticket_price }}</span>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="text-sm text-gray-400">
+                        <p><i class="fas fa-check text-green-500 mr-2"></i>Entry to the event</p>
+                        <p><i class="fas fa-check text-green-500 mr-2"></i>Food & refreshments</p>
+                        <p><i class="fas fa-check text-green-500 mr-2"></i>Live entertainment</p>
+                        <p><i class="fas fa-check text-green-500 mr-2"></i>QR code entry pass via email</p>
+                    </div>
+                </div>
+
+                <div class="form-control">
+                    <button type="submit" class="btn btn-primary btn-lg w-full" id="payButton">
+                        <i class="fas fa-credit-card mr-2"></i>
+                        Pay ₹{{ event.ticket_price }} & Register
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Modal -->
+<div id="loadingModal" class="modal">
+    <div class="modal-box text-center">
+        <span class="loading loading-spinner loading-lg text-primary"></span>
+        <p class="mt-4">Processing your payment...</p>
+    </div>
+</div>
+
+<!-- Success Modal -->
+<div id="successModal" class="modal">
+    <div class="modal-box text-center">
+        <i class="fas fa-check-circle text-6xl text-green-500 mb-4"></i>
+        <h3 class="font-bold text-lg mb-4">Payment Successful!</h3>
+        <p class="mb-4">Your QR code has been sent to your email.</p>
+        <div class="modal-action justify-center">
+            <a href="{{ url_for('success') }}" class="btn btn-primary">Continue</a>
+        </div>
+    </div>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+document.getElementById('registrationForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const data = {
+        name: formData.get('name'),
+        email: formData.get('email'),
+        mobile: formData.get('mobile')
+    };
+    
+    // Validate form
+    if (!data.name || !data.email || !data.mobile) {
+        alert('Please fill all required fields');
+        return;
+    }
+    
+    // Show loading
+    document.getElementById('loadingModal').classList.add('modal-open');
+    
+    try {
+        // Create Razorpay order
+        const orderResponse = await fetch('/create_order', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        
+        const orderData = await orderResponse.json();
+        
+        if (!orderData.success) {
+            throw new Error(orderData.error);
+        }
+        
+        // Initialize Razorpay
+        const options = {
+            key: orderData.key,
+            amount: orderData.amount,
+            currency: orderData.currency,
+            name: '{{ event.name }}',
+            description: 'Event Registration',
+            order_id: orderData.order_id,
+            prefill: {
+                name: data.name,
+                email: data.email,
+                contact: data.mobile
+            },
+            theme: {
+                color: '#00ffff'
+            },
+            handler: async function(response) {
+                // Payment successful
+                const paymentData = {
+                    ...data,
+                    ...response
+                };
+                
+                const successResponse = await fetch('/payment_success', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(paymentData)
+                });
+                
+                const result = await successResponse.json();
+                
+                document.getElementById('loadingModal').classList.remove('modal-open');
+                
+                if (result.success) {
+                    document.getElementById('successModal').classList.add('modal-open');
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            },
+            modal: {
+                ondismiss: function() {
+                    document.getElementById('loadingModal').classList.remove('modal-open');
+                }
+            }
+        };
+        
+        document.getElementById('loadingModal').classList.remove('modal-open');
+        
+        const rzp = new Razorpay(options);
+        rzp.open();
+        
+    } catch (error) {
+        document.getElementById('loadingModal').classList.remove('modal-open');
+        alert('Error: ' + error.message);
+    }
+});
+</script>
+{% endblock %}
+
+<!-- ==================== templates/success.html ==================== -->
+{% extends "base.html" %}
+
+{% block title %}Registration Successful - {{ event.name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto text-center">
+    <div class="mb-8">
+        <i class="fas fa-check-circle text-8xl text-green-500 mb-6 animate-bounce"></i>
+        <h1 class="text-4xl font-bold bg-gradient-to-r from-neon to-green-500 bg-clip-text text-transparent mb-4">
+            Registration Successful!
+        </h1>
+        <p class="text-xl text-gray-300 mb-8">Welcome to {{ event.name }}!</p>
+    </div>
+
+    <div class="card bg-base-200/30 backdrop-blur-md shadow-xl mb-8">
+        <div class="card-body">
+            <h2 class="card-title justify-center text-2xl mb-4">What's Next?</h2>
+            
+            <div class="space-y-4 text-left">
+                <div class="flex items-start space-x-4">
+                    <div class="w-8 h-8 bg-neon rounded-full flex items-center justify-center flex-shrink-0">
+                        <span class="text-black font-bold">1</span>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-neon">Check Your Email</h3>
+                        <p class="text-gray-400 text-sm">Your QR code entry pass has been sent to your email address.</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start space-x-4">
+                    <div class="w-8 h-8 bg-neon-purple rounded-full flex items-center justify-center flex-shrink-0">
+                        <span class="text-black font-bold">2</span>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-neon-purple">Save Your QR Code</h3>
+                        <p class="text-gray-400 text-sm">Download and save the QR code to your phone for easy access.</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start space-x-4">
+                    <div class="w-8 h-8 bg-neon-pink rounded-full flex items-center justify-center flex-shrink-0">
+                        <span class="text-black font-bold">3</span>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-neon-pink">Event Day</h3>
+                        <p class="text-gray-400 text-sm">Show your QR code at the entrance for quick entry.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-6 mb-8">
+        <div class="card bg-base-200/30 backdrop-blur-md shadow-xl">
+            <div class="card-body text-center">
+                <i class="fas fa-calendar-alt text-3xl text-neon mb-2"></i>
+                <h3 class="font-bold">Event Date</h3>
+                <p class="text-gray-300">{{ event.date }}</p>
+                <p class="text-gray-300">{{ event.time }}</p>
+            </div>
+        </div>
+        
+        <div class="card bg-base-200/30 backdrop-blur-md shadow-xl">
+            <div class="card-body text-center">
+                <i class="fas fa-map-marker-alt text-3xl text-neon-purple mb-2"></i>
+                <h3 class="font-bold">Venue</h3>
+                <p class="text-gray-300">{{ event.venue }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="space-y-4">
+        <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">
+            <i class="fas fa-home mr-2"></i>
+            Back to Home
+        </a>
+        
+        <div class="text-center">
+            <p class="text-gray-400 mb-2">Need help?</p>
+            <a href="https://wa.me/{{ event.whatsapp }}" target="_blank" class="btn btn-outline btn-success">
+                <i class="fab fa-whatsapp mr-2"></i>
+                Contact Support
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

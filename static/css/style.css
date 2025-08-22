@@ -1,1 +1,222 @@
+/* <!-- ==================== static/css/style.css ==================== --> */
+/* Custom styles for Fresher's Party website */
 
+:root {
+  --neon: #00ffff;
+  --neon-purple: #bd00ff;
+  --neon-pink: #ff007f;
+  --neon-green: #00ff41;
+}
+
+/* Global animations */
+@keyframes neonGlow {
+  0%,
+  100% {
+    text-shadow: 0 0 5px var(--neon), 0 0 10px var(--neon), 0 0 15px var(--neon);
+  }
+  50% {
+    text-shadow: 0 0 10px var(--neon), 0 0 20px var(--neon),
+      0 0 30px var(--neon);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Custom button effects */
+.btn:hover {
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  box-shadow: 0 10px 20px rgba(0, 255, 255, 0.3);
+}
+
+/* Card hover effects */
+.card:hover {
+  transform: translateY(-5px);
+  transition: all 0.3s ease;
+}
+
+/* Neon text effects */
+.text-neon {
+  color: var(--neon);
+}
+
+.text-neon-purple {
+  color: var(--neon-purple);
+}
+
+.text-neon-pink {
+  color: var(--neon-pink);
+}
+
+/* Custom shadows */
+.shadow-neon {
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+.shadow-neon-purple {
+  box-shadow: 0 0 20px rgba(189, 0, 255, 0.3);
+}
+
+.shadow-neon-pink {
+  box-shadow: 0 0 20px rgba(255, 0, 127, 0.3);
+}
+
+/* Backdrop blur effects */
+.backdrop-blur-md {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Custom animations for elements */
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-slide-left {
+  animation: slideInLeft 0.8s ease-out;
+}
+
+.animate-slide-right {
+  animation: slideInRight 0.8s ease-out;
+}
+
+.animate-fade-up {
+  animation: fadeInUp 0.8s ease-out;
+}
+
+/* WhatsApp button custom styling */
+.whatsapp-float {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+/* Countdown timer styling */
+#countdown .stat {
+  border: 1px solid rgba(0, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Form enhancements */
+.input:focus {
+  box-shadow: 0 0 0 3px rgba(0, 255, 255, 0.1);
+  border-color: var(--neon);
+}
+
+/* Table enhancements for admin */
+.table-zebra tbody tr:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.table-zebra tbody tr:hover {
+  background-color: rgba(0, 255, 255, 0.1);
+}
+
+/* Modal enhancements */
+.modal-box {
+  background: linear-gradient(
+    135deg,
+    rgba(15, 23, 42, 0.95),
+    rgba(88, 28, 135, 0.95)
+  );
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 255, 255, 0.1);
+}
+
+/* Loading spinner custom colors */
+.loading-spinner {
+  border-top-color: var(--neon);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(45deg, var(--neon), var(--neon-purple));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(45deg, var(--neon-purple), var(--neon-pink));
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .hero h1 {
+    font-size: 3rem !important;
+  }
+
+  #countdown {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+
+  .stat-value {
+    font-size: 1.5rem !important;
+  }
+}
+
+/* Custom DaisyUI theme adjustments */
+[data-theme="dark"] {
+  --rounded-box: 1rem;
+  --rounded-btn: 0.5rem;
+  --rounded-badge: 1.9rem;
+  --animation-btn: 0.25s;
+  --animation-input: 0.2s;
+  --btn-text-case: uppercase;
+  --btn-focus-scale: 0.95;
+  --border-btn: 1px;
+  --tab-border: 1px;
+  --tab-radius: 0.5rem;
+}

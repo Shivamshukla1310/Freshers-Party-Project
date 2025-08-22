@@ -1,1 +1,114 @@
 
+<!-- ==================== templates/emails/qr_email.html ==================== -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your {{ event.name }} Entry Pass</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+        }
+        .header {
+            margin-bottom: 30px;
+        }
+        .title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #00ffff, #ff007f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .event-details {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .qr-section {
+            background-color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 30px 0;
+            color: #333;
+        }
+        .qr-code {
+            font-family: monospace;
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+            word-break: break-all;
+            font-size: 12px;
+        }
+        .instructions {
+            text-align: left;
+            margin: 20px 0;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 14px;
+            color: #cccccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">🎉 {{ event.name }} 🎉</h1>
+            <p>Hi {{ name }}, you're all set!</p>
+        </div>
+
+        <div class="event-details">
+            <h2>Event Details</h2>
+            <p><strong>📅 Date:</strong> {{ event.date }}</p>
+            <p><strong>🕕 Time:</strong> {{ event.time }}</p>
+            <p><strong>📍 Venue:</strong> {{ event.venue }}</p>
+            <p><strong>👔 Dress Code:</strong> {{ event.dress_code }}</p>
+        </div>
+
+        <div class="qr-section">
+            <h2 style="color: #333;">Your Entry Pass</h2>
+            <p style="color: #666;">Show this QR code at the entrance</p>
+            
+            <div class="qr-code">{{ qr_code }}</div>
+            
+            <p style="color: #666; font-size: 12px; margin-top: 15px;">
+                <strong>Important:</strong> This QR code can only be used once for entry.
+            </p>
+        </div>
+
+        <div class="instructions">
+            <h3>Entry Instructions:</h3>
+            <ol>
+                <li>Save this email or take a screenshot of the QR code</li>
+                <li>Arrive at the venue between 5:30 PM - 6:30 PM</li>
+                <li>Show your QR code at the registration desk</li>
+                <li>Enjoy the party! 🥳</li>
+            </ol>
+        </div>
+
+        <div class="footer">
+            <p>Need help? Contact us:</p>
+            <p>📞 {{ event.contact }} | 📧 {{ event.email }}</p>
+            <p>WhatsApp: <a href="https://wa.me/{{ event.whatsapp }}" style="color: #00ffff;">Click here to chat</a></p>
+        </div>
+    </div>
+</body>
+</html>
+

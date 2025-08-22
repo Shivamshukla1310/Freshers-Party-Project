@@ -1,1 +1,72 @@
 
+<!-- ==================== templates/admin/login.html ==================== -->
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Fresher's Party</title>
+    
+    <!-- DaisyUI + Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.4.19/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+    <div class="card w-full max-w-md bg-base-200/30 backdrop-blur-md shadow-xl">
+        <div class="card-body">
+            <div class="text-center mb-6">
+                <i class="fas fa-shield-alt text-4xl text-cyan-400 mb-4"></i>
+                <h1 class="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+                    Admin Login
+                </h1>
+            </div>
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="alert alert-error mb-4">
+                        {% for message in messages %}
+                            <span>{{ message }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST">
+                <div class="form-control mb-4">
+                    <label class="label">
+                        <span class="label-text">Username</span>
+                    </label>
+                    <input type="text" name="username" class="input input-bordered" placeholder="Enter username" required>
+                </div>
+
+                <div class="form-control mb-6">
+                    <label class="label">
+                        <span class="label-text">Password</span>
+                    </label>
+                    <input type="password" name="password" class="input input-bordered" placeholder="Enter password" required>
+                </div>
+
+                <div class="form-control">
+                    <button type="submit" class="btn btn-primary w-full">
+                        <i class="fas fa-sign-in-alt mr-2"></i>
+                        Login
+                    </button>
+                </div>
+            </form>
+
+            <div class="divider"></div>
+            
+            <div class="text-center">
+                <a href="{{ url_for('index') }}" class="btn btn-ghost btn-sm">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Back to Event
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
