@@ -345,8 +345,11 @@ def send_qr_email(email, name, qr_img_base64, qr_code):
         print(f"Failed to send email: {e}")
 
 # Initialize database and create admin user
-@app.before_first_request
-def create_tables():
+# @app.before_first_request
+# def create_tables():
+#     db.create_all()
+
+with app.app_context():
     db.create_all()
     
     # Create default admin if not exists
