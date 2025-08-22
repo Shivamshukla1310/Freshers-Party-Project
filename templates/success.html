@@ -1,1 +1,90 @@
 
+<!-- ==================== templates/success.html ==================== -->
+{% extends "base.html" %}
+
+{% block title %}Registration Successful - {{ event.name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto text-center">
+    <div class="mb-8">
+        <i class="fas fa-check-circle text-8xl text-green-500 mb-6 animate-bounce"></i>
+        <h1 class="text-4xl font-bold bg-gradient-to-r from-neon to-green-500 bg-clip-text text-transparent mb-4">
+            Registration Successful!
+        </h1>
+        <p class="text-xl text-gray-300 mb-8">Welcome to {{ event.name }}!</p>
+    </div>
+
+    <div class="card bg-base-200/30 backdrop-blur-md shadow-xl mb-8">
+        <div class="card-body">
+            <h2 class="card-title justify-center text-2xl mb-4">What's Next?</h2>
+            
+            <div class="space-y-4 text-left">
+                <div class="flex items-start space-x-4">
+                    <div class="w-8 h-8 bg-neon rounded-full flex items-center justify-center flex-shrink-0">
+                        <span class="text-black font-bold">1</span>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-neon">Check Your Email</h3>
+                        <p class="text-gray-400 text-sm">Your QR code entry pass has been sent to your email address.</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start space-x-4">
+                    <div class="w-8 h-8 bg-neon-purple rounded-full flex items-center justify-center flex-shrink-0">
+                        <span class="text-black font-bold">2</span>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-neon-purple">Save Your QR Code</h3>
+                        <p class="text-gray-400 text-sm">Download and save the QR code to your phone for easy access.</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start space-x-4">
+                    <div class="w-8 h-8 bg-neon-pink rounded-full flex items-center justify-center flex-shrink-0">
+                        <span class="text-black font-bold">3</span>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-neon-pink">Event Day</h3>
+                        <p class="text-gray-400 text-sm">Show your QR code at the entrance for quick entry.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-6 mb-8">
+        <div class="card bg-base-200/30 backdrop-blur-md shadow-xl">
+            <div class="card-body text-center">
+                <i class="fas fa-calendar-alt text-3xl text-neon mb-2"></i>
+                <h3 class="font-bold">Event Date</h3>
+                <p class="text-gray-300">{{ event.date }}</p>
+                <p class="text-gray-300">{{ event.time }}</p>
+            </div>
+        </div>
+        
+        <div class="card bg-base-200/30 backdrop-blur-md shadow-xl">
+            <div class="card-body text-center">
+                <i class="fas fa-map-marker-alt text-3xl text-neon-purple mb-2"></i>
+                <h3 class="font-bold">Venue</h3>
+                <p class="text-gray-300">{{ event.venue }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="space-y-4">
+        <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">
+            <i class="fas fa-home mr-2"></i>
+            Back to Home
+        </a>
+        
+        <div class="text-center">
+            <p class="text-gray-400 mb-2">Need help?</p>
+            <a href="https://wa.me/{{ event.whatsapp }}" target="_blank" class="btn btn-outline btn-success">
+                <i class="fab fa-whatsapp mr-2"></i>
+                Contact Support
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
