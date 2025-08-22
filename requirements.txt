@@ -409,3 +409,11 @@ zict @ file:///C:/Users/dev-admin/perseverance-python-buildout/croot/zict_169954
 zipp @ file:///C:/Users/dev-admin/perseverance-python-buildout/croot/zipp_1707493775475/work
 zope.interface @ file:///C:/Users/dev-admin/perseverance-python-buildout/croot/zope.interface_1699497164709/work
 zstandard @ file:///C:/b/abs_82dff2ths3/croot/zstandard_1728569207191/work
+
+Flask==2.3.3
+Flask-SQLAlchemy==3.0.5
+Flask-Mail==0.9.1
+Werkzeug==2.3.7
+qrcode[pil]==7.4.2
+razorpay==1.4.1
+Pillow==10.0.1
