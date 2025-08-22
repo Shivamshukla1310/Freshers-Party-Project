@@ -1,1 +1,91 @@
 
+
+<!-- ==================== templates/base.html ==================== -->
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ event.name }}{% endblock %}</title>
+    
+    <!-- DaisyUI + Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.4.19/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'neon': '#00ffff',
+                        'neon-purple': '#bd00ff',
+                        'neon-pink': '#ff007f'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <!-- Navigation -->
+    <nav class="navbar bg-base-100/10 backdrop-blur-md sticky top-0 z-50">
+        <div class="navbar-start">
+            <a href="{{ url_for('index') }}" class="btn btn-ghost text-xl text-neon">
+                <i class="fas fa-party-horn mr-2"></i>
+                Fresher's Party
+            </a>
+        </div>
+        <div class="navbar-end">
+            <a href="{{ url_for('register') }}" class="btn btn-primary btn-sm mr-2">
+                <i class="fas fa-ticket mr-1"></i>
+                Register
+            </a>
+            <div class="dropdown dropdown-end">
+                <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
+                    <i class="fas fa-bars"></i>
+                </div>
+                <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+                    <li><a href="{{ url_for('index') }}"><i class="fas fa-home mr-2"></i>Home</a></li>
+                    <li><a href="{{ url_for('register') }}"><i class="fas fa-user-plus mr-2"></i>Register</a></li>
+                    <li><a href="{{ url_for('admin_login') }}"><i class="fas fa-shield-alt mr-2"></i>Admin</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="alert alert-info mb-4">
+                    {% for message in messages %}
+                        <span>{{ message }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- WhatsApp Float Button -->
+    <div class="fixed bottom-6 right-6 z-50">
+        <a href="https://wa.me/{{ event.whatsapp }}?text=Hi! I have a query about the Fresher's Party" 
+           target="_blank" class="btn btn-circle btn-lg bg-green-500 hover:bg-green-600 border-none text-white shadow-lg animate-pulse">
+            <i class="fab fa-whatsapp text-2xl"></i>
+        </a>
+    </div>
+
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

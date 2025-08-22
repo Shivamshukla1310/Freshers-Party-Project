@@ -1,1 +1,183 @@
 
+<!-- ==================== templates/register.html ==================== -->
+{% extends "base.html" %}
+
+{% block title %}Register - {{ event.name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold bg-gradient-to-r from-neon to-neon-purple bg-clip-text text-transparent mb-4">
+            Register for {{ event.name }}
+        </h1>
+        <p class="text-gray-300">Secure your spot at the biggest party of the year!</p>
+    </div>
+
+    <div class="card bg-base-200/30 backdrop-blur-md shadow-xl">
+        <div class="card-body">
+            <form id="registrationForm">
+                <div class="form-control mb-4">
+                    <label class="label">
+                        <span class="label-text text-neon">Full Name *</span>
+                    </label>
+                    <input type="text" name="name" class="input input-bordered input-primary" placeholder="Enter your full name" required>
+                </div>
+
+                <div class="form-control mb-4">
+                    <label class="label">
+                        <span class="label-text text-neon-purple">Email Address *</span>
+                    </label>
+                    <input type="email" name="email" class="input input-bordered input-secondary" placeholder="Enter your email" required>
+                </div>
+
+                <div class="form-control mb-6">
+                    <label class="label">
+                        <span class="label-text text-neon-pink">Mobile Number *</span>
+                    </label>
+                    <input type="tel" name="mobile" class="input input-bordered input-accent" placeholder="Enter your mobile number" required>
+                </div>
+
+                <!-- Ticket Info -->
+                <div class="bg-base-300/50 rounded-lg p-6 mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-lg font-semibold">Event Ticket</span>
+                        <span class="text-2xl font-bold text-neon">₹{{ event.ticket_price }}</span>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="text-sm text-gray-400">
+                        <p><i class="fas fa-check text-green-500 mr-2"></i>Entry to the event</p>
+                        <p><i class="fas fa-check text-green-500 mr-2"></i>Food & refreshments</p>
+                        <p><i class="fas fa-check text-green-500 mr-2"></i>Live entertainment</p>
+                        <p><i class="fas fa-check text-green-500 mr-2"></i>QR code entry pass via email</p>
+                    </div>
+                </div>
+
+                <div class="form-control">
+                    <button type="submit" class="btn btn-primary btn-lg w-full" id="payButton">
+                        <i class="fas fa-credit-card mr-2"></i>
+                        Pay ₹{{ event.ticket_price }} & Register
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Modal -->
+<div id="loadingModal" class="modal">
+    <div class="modal-box text-center">
+        <span class="loading loading-spinner loading-lg text-primary"></span>
+        <p class="mt-4">Processing your payment...</p>
+    </div>
+</div>
+
+<!-- Success Modal -->
+<div id="successModal" class="modal">
+    <div class="modal-box text-center">
+        <i class="fas fa-check-circle text-6xl text-green-500 mb-4"></i>
+        <h3 class="font-bold text-lg mb-4">Payment Successful!</h3>
+        <p class="mb-4">Your QR code has been sent to your email.</p>
+        <div class="modal-action justify-center">
+            <a href="{{ url_for('success') }}" class="btn btn-primary">Continue</a>
+        </div>
+    </div>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+document.getElementById('registrationForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const data = {
+        name: formData.get('name'),
+        email: formData.get('email'),
+        mobile: formData.get('mobile')
+    };
+    
+    // Validate form
+    if (!data.name || !data.email || !data.mobile) {
+        alert('Please fill all required fields');
+        return;
+    }
+    
+    // Show loading
+    document.getElementById('loadingModal').classList.add('modal-open');
+    
+    try {
+        // Create Razorpay order
+        const orderResponse = await fetch('/create_order', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        
+        const orderData = await orderResponse.json();
+        
+        if (!orderData.success) {
+            throw new Error(orderData.error);
+        }
+        
+        // Initialize Razorpay
+        const options = {
+            key: orderData.key,
+            amount: orderData.amount,
+            currency: orderData.currency,
+            name: '{{ event.name }}',
+            description: 'Event Registration',
+            order_id: orderData.order_id,
+            prefill: {
+                name: data.name,
+                email: data.email,
+                contact: data.mobile
+            },
+            theme: {
+                color: '#00ffff'
+            },
+            handler: async function(response) {
+                // Payment successful
+                const paymentData = {
+                    ...data,
+                    ...response
+                };
+                
+                const successResponse = await fetch('/payment_success', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(paymentData)
+                });
+                
+                const result = await successResponse.json();
+                
+                document.getElementById('loadingModal').classList.remove('modal-open');
+                
+                if (result.success) {
+                    document.getElementById('successModal').classList.add('modal-open');
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            },
+            modal: {
+                ondismiss: function() {
+                    document.getElementById('loadingModal').classList.remove('modal-open');
+                }
+            }
+        };
+        
+        document.getElementById('loadingModal').classList.remove('modal-open');
+        
+        const rzp = new Razorpay(options);
+        rzp.open();
+        
+    } catch (error) {
+        document.getElementById('loadingModal').classList.remove('modal-open');
+        alert('Error: ' + error.message);
+    }
+});
+</script>
+{% endblock %}
+
