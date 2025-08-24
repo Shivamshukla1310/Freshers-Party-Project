@@ -59,7 +59,7 @@ app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'tukaaramgore@gmail.com'  # Replace with your email
 app.config['MAIL_PASSWORD'] = 'gcio ynte oyap tqwv'     # Replace with your app password
-app.config['MAIL_DEFAULT_SENDER'] = 'your-email@gmail.com'
+app.config['MAIL_DEFAULT_SENDER'] = 'tukaaramgore@gmail.com'
 
 # Razorpay configuration (Test mode)
 app.config['RAZORPAY_KEY_ID'] = 'rzp_test_your_key_id'
@@ -92,15 +92,15 @@ class Admin(db.Model):
 
 # Event configuration
 EVENT_CONFIG = {
-    'name': 'Fresher\'s Party 2024',
-    'date': '2024-12-15',
+    'name': 'Fresher\'s Party 2025',
+    'date': '2025-09-17',
     'time': '6:00 PM',
-    'venue': 'University Auditorium',
+    'venue': 'Ajeenkya D.Y Patil University, Near Swimming Pool Area',
     'dress_code': 'Semi-Formal',
-    'contact': '+91 9876543210',
-    'whatsapp': '919876543210',
+    'contact': '+91 9601514584',
+    'whatsapp': '919601514584',
     'ticket_price': 500,  # In rupees
-    'email': 'events@university.edu'
+    'email': 'tukaaramgore@gmail.com'
 }
 
 # Routes
@@ -192,11 +192,26 @@ def success():
     return render_template('success.html', event=EVENT_CONFIG)
 
 # Admin routes
-@app.route('/admin')
+@app.route('/admin', methods=['GET', 'POST'])
 def admin_login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        
+        admin = Admin.query.filter_by(username=username).first()
+        if admin and check_password_hash(admin.password_hash, password):
+            session['admin_logged_in'] = True
+            session['admin_username'] = username
+            return redirect(url_for('admin_dashboard'))
+        
+        flash('Invalid credentials')
+        return redirect(url_for('admin_login'))
+
+    # GET → show login page
     if 'admin_logged_in' in session:
         return redirect(url_for('admin_dashboard'))
     return render_template('admin/login.html')
+
 
 @app.route('/admin/login', methods=['POST'])
 def admin_login_post():
